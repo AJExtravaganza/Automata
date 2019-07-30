@@ -1,21 +1,25 @@
 class PushdownAutomata:
-    input_symbols_str = 'ab'
-    pushdown_symbols_str = '$ab'
-    initial_stack = '$'
 
+    def __init__(self, terminal_alphabet_str, stack_alphabet_str, initial_stack_str, states_list, final_states_list, transitions_dict):
+        self.input_symbols = terminal_alphabet_str
+        self.pushdown_symbols = stack_alphabet_str
+        self.initial_stack = initial_stack_str
+        self.states = states_list
+        self.final_states = final_states_list
+        self.transitions = transitions_dict
 
-    states = [0,1,2]
-    final_states = [2,]
-
-    #transitions defined (from_state, read_symbol, stack_top) : (to_state, stack_push)
-    transitions = {
-        (0, 'a', '$'): [(0, '$a'), ],
-        (0, 'a', 'a'): [(0, 'aa'), ],
-        (0, 'b', 'a'): [(1, ''), ],
-        (0, '', '$')  : [(2, ''), ],
-        (1, 'b', 'a'): [(1, ''), ],
-        (1, '', '$')  : [(2, ''), ]
-    }
+        # Check that the parameters are valid
+        assert self.initial_stack in self.pushdown_symbols
+        for final_state in self.final_states:
+            assert final_state in self.states
+        for condition, transitions in self.transitions.items():
+            assert condition[0] in self.states
+            assert condition[1] in self.input_symbols
+            assert condition[2] in self.pushdown_symbols
+            for transition in transitions:
+                assert transition[0] in self.states
+                for char in transition[1]:
+                    assert char in self.pushdown_symbols
 
     def string_in_language(self, input_str, current_state=0, stack=None):
         # For initial call, initialise the stack
@@ -38,7 +42,26 @@ class PushdownAutomata:
         return False
 
 
-pda = PushdownAutomata()
+# define parameters
+terminal_alphabet = 'ab'
+stack_alphabet = '$ab'
+initial_stack = '$'
+
+states = [0, 1, 2]
+final_states = [2, ]
+
+# transitions defined (from_state, read_symbol, stack_top) : (to_state, stack_push)
+transitions = {
+    (0, 'a', '$'): [(0, '$a'), ],
+    (0, 'a', 'a'): [(0, 'aa'), ],
+    (0, 'b', 'a'): [(1, ''), ],
+    (0, '', '$'): [(2, ''), ],
+    (1, 'b', 'a'): [(1, ''), ],
+    (1, '', '$'): [(2, ''), ]
+}
+
+
+pda = PushdownAutomata(terminal_alphabet, stack_alphabet, initial_stack, states, final_states, transitions)
 
 test_strings = ('', 'ab', 'aabb', 'ba', 'abab')
 
